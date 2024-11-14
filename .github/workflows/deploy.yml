@@ -1,0 +1,39 @@
+name: Deploy with Terraform
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Install Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.5
+
+      # Run `terraform init`
+      - name: Terraform Init
+        run: terraform init
+
+      # Run `terraform validate`
+      - name: Terraform Validate
+        run: terraform validate
+
+      # Run `terraform plan`
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      # Run `terraform apply`
+      - name: Terraform Apply
+        run: terraform apply -input=false tfplan
+
+    env:
+      DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+      SSH_FINGERPRINT: ${{ secrets.SSH_FINGERPRINT }}
