@@ -1,8 +1,10 @@
-name: Deploy with Terraform
+name: Deploy with OpenTofu
+
 on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -12,27 +14,28 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Install Terraform
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.5
+      # Install OpenTofu
+      - name: Setup OpenTofu
+        run: |
+          curl -L https://github.com/opentofu/opentofu/releases/download/v0.1.0/opentofu-linux-amd64 -o opentofu
+          chmod +x opentofu
+          sudo mv opentofu /usr/local/bin/tofu
 
-      # Run `terraform init`
-      - name: Terraform Init
-        run: terraform init
+      # Run `tofu init`
+      - name: OpenTofu Init
+        run: tofu init
 
-      # Run `terraform validate`
-      - name: Terraform Validate
-        run: terraform validate
+      # Run `tofu validate`
+      - name: OpenTofu Validate
+        run: tofu validate
 
-      # Run `terraform plan`
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan
+      # Run `tofu plan`
+      - name: OpenTofu Plan
+        run: tofu plan -out=tfplan
 
-      # Run `terraform apply`
-      - name: Terraform Apply
-        run: terraform apply -input=false tfplan
+      # Run `tofu apply`
+      - name: OpenTofu Apply
+        run: tofu apply -input=false tfplan
 
     env:
       DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
